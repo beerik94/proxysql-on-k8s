@@ -288,11 +288,10 @@ type MySQLGaleraHostgroup struct {
 	// +optional
 	// +kubebuilder:validation:Minimum=0
 	MaxWriters *int32 `json:"maxWriters,omitempty"`
-	// WriterIsAlsoReader controls whether writers also serve reads:
-	// 0 = writers are not placed in the reader hostgroup, 1 = writers and
-	// backup writers are also readers, 2 = only backup writers are also
-	// readers (the writer stays write-only). Maps to
-	// writer_is_also_reader; ProxySQL default 0.
+	// WriterIsAlsoReader controls which tiers are mirrored into the reader
+	// hostgroup: 0 = neither writers nor backup writers are placed there,
+	// 1 = both are, 2 = only backup writers are, so the writer stays
+	// write-only. Maps to writer_is_also_reader; ProxySQL default 0.
 	// +optional
 	// +kubebuilder:validation:Enum=0;1;2
 	WriterIsAlsoReader *int32 `json:"writerIsAlsoReader,omitempty"`
