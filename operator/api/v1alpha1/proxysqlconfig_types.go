@@ -297,8 +297,8 @@ type MySQLGaleraHostgroup struct {
 	WriterIsAlsoReader *int32 `json:"writerIsAlsoReader,omitempty"`
 	// MaxTransactionsBehind is the Galera flow-control lag threshold: a node
 	// whose wsrep_local_recv_queue exceeds it is moved to the offline
-	// hostgroup until it catches up. 0 disables the check. Maps to
-	// max_transactions_behind; ProxySQL default 0.
+	// hostgroup until it catches up. Maps to max_transactions_behind;
+	// ProxySQL default 0, which tolerates no queued writesets.
 	// +optional
 	// +kubebuilder:validation:Minimum=0
 	MaxTransactionsBehind *int32 `json:"maxTransactionsBehind,omitempty"`

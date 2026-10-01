@@ -228,8 +228,23 @@ YAML
   log "galera: query-rejecting node parked in the offline hostgroup (hg13)"
 
   # The offline move is ALSO not drift — hg13 is part of the row's class.
+  # driftedReplicas still carries the value from the PREVIOUS runtime check at
+  # this point, so wait for a fresh one before reading it, exactly as the
+  # failover assertion above does; otherwise this passes vacuously.
+  t0="$t1"
+  for _ in $(seq 1 25); do
+    t1="$(kubectl -n "$ns" get proxysqlconfig pxcfg -o jsonpath='{.status.lastRuntimeCheckTime}')"
+    [[ -n "$t1" && "$t1" != "$t0" ]] && break
+    sleep 4
+  done
+  [[ -n "$t1" && "$t1" != "$t0" ]] ||
+    { fail "galera: no informed resync ran after the offline move"; dump_ns "$ns"; return 1; }
   out="$(kubectl -n "$ns" get proxysqlconfig pxcfg -o jsonpath='{.status.driftedReplicas}')"
   [[ -z "$out" || "$out" == "0" ]] ||
     { fail "galera: offline placement flagged as drift (driftedReplicas='$out')"; dump_ns "$ns"; return 1; }
-  log "galera: offline placement is not drift either"
+  # ...and the node is still parked offline, not dragged back by that resync.
+  out="$(_galera_hosts "$ns" pxc "$radmin" 13)"
+  [[ "$out" == "$writer" ]] ||
+    { fail "galera: resync moved the offline node out of hg13 (hg13='$out')"; dump_ns "$ns"; return 1; }
+  log "galera: offline placement survived a resync and is not drift either"
 }

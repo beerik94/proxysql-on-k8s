@@ -148,7 +148,7 @@ unset fields emit the column default (shown in the Default column).
 | `active` | `*bool` | unset → SQL `1` | — | Monitor and manage this row's hostgroups. `false` freezes current placement. |
 | `maxWriters` | `*int32` | unset → SQL `1` | min 0 | How many nodes stay in the writer hostgroup; the rest go to the backup-writer hostgroup. |
 | `writerIsAlsoReader` | `*int32` | unset → SQL `0` | enum: 0, 1, 2 | Which tiers are mirrored into the reader hostgroup: 0 = neither writers nor backup writers; 1 = both; 2 = only backup writers, so the writer stays write-only. |
-| `maxTransactionsBehind` | `*int32` | unset → SQL `0` | min 0 | Flow-control lag threshold: a node whose `wsrep_local_recv_queue` exceeds it is moved offline. 0 disables the check. |
+| `maxTransactionsBehind` | `*int32` | unset → SQL `0` | min 0 | Flow-control lag threshold: a node whose `wsrep_local_recv_queue` exceeds it is moved offline. The default 0 tolerates no queued writesets. |
 | `comment` | `string` | `''` | — | Free text. |
 
 Admission mirrors the ProxySQL table's constraints: the four hostgroups of a

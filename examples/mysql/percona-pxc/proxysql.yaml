@@ -46,15 +46,19 @@ spec:
       # in the backup-writer hostgroup. Galera certifies writes cluster-wide,
       # so multi-writer is *correct* but conflicting transactions on different
       # nodes fail certification and get deadlock errors at COMMIT. Routing
-      # writes to one node avoids that entirely. Set maxWriters: 3 to restore
-      # the multi-writer behavior this example used before.
+      # writes to one node avoids that entirely. maxWriters: 3 restores the
+      # multi-writer behavior this example used before — but it also empties
+      # the backup-writer hostgroup, so switch writerIsAlsoReader to 1 at the
+      # same time or query rule 100 will route SELECTs at an empty hostgroup.
       maxWriters: 1
       # 2 = only the backup writers also serve reads, so the writer stays
-      # write-only. Use 1 to have the writer serve reads too, or 0 to keep the
-      # reader hostgroup empty (then remove the query rule below).
+      # write-only. Use 1 to have the writer serve reads too, or 0 to mirror
+      # neither tier — with no read-only node in a healthy PXC cluster that
+      # leaves the reader hostgroup empty, so drop query rule 100 as well.
       writerIsAlsoReader: 2
-      # A node lagging this many transactions behind (wsrep_local_recv_queue)
-      # is parked in the offline hostgroup until it catches up. 0 = never.
+      # A node whose wsrep_local_recv_queue exceeds this is parked in the
+      # offline hostgroup until it catches up. ProxySQL's default is 0, which
+      # tolerates no queued writesets.
       maxTransactionsBehind: 0
   mysqlUsers:
     - username: root

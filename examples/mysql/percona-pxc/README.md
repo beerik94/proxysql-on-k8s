@@ -21,8 +21,10 @@ the monitor do the rest:
 Writes therefore land on a single node. Galera certifies writes cluster-wide,
 so multi-writer is *correct*, but conflicting transactions committed on
 different nodes fail certification and surface as deadlock errors at `COMMIT`.
-Single-writer routing avoids that; set `maxWriters: 3` to restore the
-multi-writer behavior this example used previously.
+Single-writer routing avoids that. `maxWriters: 3` restores the multi-writer
+behavior this example used previously, but it leaves no backup writers — so
+`writerIsAlsoReader: 2` would empty the reader hostgroup and strand query rule
+100. Change it to `1` in the same edit.
 
 Because the operator only syncs the table and follows the monitor, a writer
 change — election, promotion after a node leaves, a node parked offline — is

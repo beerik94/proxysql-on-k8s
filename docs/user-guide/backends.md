@@ -182,8 +182,10 @@ spec:
   certification at `COMMIT`. Raise it for multi-writer.
 - **backup writer** holds the remaining Synced nodes, promoted when the
   writer leaves.
-- **reader** holds whatever `writerIsAlsoReader` mirrors in: `0` nothing,
-  `1` writers and backup writers, `2` only backup writers.
+- **reader** holds any healthy node reporting `read_only=1`, plus whichever
+  writable tiers `writerIsAlsoReader` mirrors in: `0` neither, `1` writers and
+  backup writers, `2` only backup writers. With `0` the hostgroup is therefore
+  empty only while no node is read-only.
 - **offline** is where the monitor parks a node that is not Synced, is
   desynced, has `wsrep_reject_queries` set, or has exceeded
   `maxTransactionsBehind` (its `wsrep_local_recv_queue` backlog).
